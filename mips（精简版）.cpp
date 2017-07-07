@@ -9,45 +9,45 @@
 #include <queue>
 using namespace std;
 
-//µ÷ÊÔ
+//è°ƒè¯•
 //ofstream fout("log.out");
-//´Ë´¦ÊÇÄÚ´æ´óĞ¡µÄ¶¨Òå
+//æ­¤å¤„æ˜¯å†…å­˜å¤§å°çš„å®šä¹‰
 const int M = 1024 * 1024;
-//const int SIZE = 4 * M; µ÷ÊÔ½áÊøºó¸Ä»Ø
+//const int SIZE = 4 * M; è°ƒè¯•ç»“æŸåæ”¹å›
 const int SIZE = 4 * M;
-//ÕâÊÇ´ÓÎÄ¼ş¶ÁÈëÊ±Ò»ĞĞÄÜ·ÅÈëµÄ×î´óĞĞÊı
+//è¿™æ˜¯ä»æ–‡ä»¶è¯»å…¥æ—¶ä¸€è¡Œèƒ½æ”¾å…¥çš„æœ€å¤§è¡Œæ•°
 const int MAX_SIZE = 5e3;
 
-//´Ë´¦Îª¼Ä´æÆ÷£¬×¢Òâ»¹ÓĞÁ½¸öµÍÎ»£¬¸ßÎ»±£´æµÄ¼Ä´æÆ÷
-int rgstr[34] = { 0 };   //Ö¸¶¨32ºÅ¼Ä´æÆ÷ÎªµÍÎ»¼Ä´æÆ÷£¬33ºÅ¼Ä´æÆ÷Îª¸ßÎ»¼Ä´æÆ÷
+//æ­¤å¤„ä¸ºå¯„å­˜å™¨ï¼Œæ³¨æ„è¿˜æœ‰ä¸¤ä¸ªä½ä½ï¼Œé«˜ä½ä¿å­˜çš„å¯„å­˜å™¨
+int rgstr[34] = { 0 };   //æŒ‡å®š32å·å¯„å­˜å™¨ä¸ºä½ä½å¯„å­˜å™¨ï¼Œ33å·å¯„å­˜å™¨ä¸ºé«˜ä½å¯„å­˜å™¨
 
-//´Ë´¦ÎªÄÚ´æ
-char Memory[SIZE + 1] = { 0 };  //ÊÓÇé¿ö¾ö¶¨ÊÇ·ñ¸Ä³Éunsigned
-int fp = 0; int sp = SIZE;      //fp´ú±í¶Ñ¿Õ¼äµÄÖ¡Ö¸Õë£¬µØÖ·ÓÉµÍµ½¸ß£» sp´ú±íÕ»¿Õ¼äµÄµÄÕ»Ö¸Õë£¬µØÖ·ÓÉ¸ßµ½µÍ¡£
-                                //×¢ÒâfpÖ¸ÕëÖ¸ÏòµÄÊÇ¿ÕµÄÄÚ´æ
+//æ­¤å¤„ä¸ºå†…å­˜
+char Memory[SIZE + 1] = { 0 };  //è§†æƒ…å†µå†³å®šæ˜¯å¦æ”¹æˆunsigned
+int fp = 0; int sp = SIZE;      //fpä»£è¡¨å †ç©ºé—´çš„å¸§æŒ‡é’ˆï¼Œåœ°å€ç”±ä½åˆ°é«˜ï¼› spä»£è¡¨æ ˆç©ºé—´çš„çš„æ ˆæŒ‡é’ˆï¼Œåœ°å€ç”±é«˜åˆ°ä½ã€‚
+                                //æ³¨æ„fpæŒ‡é’ˆæŒ‡å‘çš„æ˜¯ç©ºçš„å†…å­˜
 
 map<int, string> map_out;
-//´Ë´¦ÊÇÖ¸ÁîÀàĞÍ
+//æ­¤å¤„æ˜¯æŒ‡ä»¤ç±»å‹
 map<string, int> label_local;
 struct tmp_ins{               
 	int No = 0; 
 	short no_of_reg[3] = { 0 };
-	int x = 0;                           //ÓÃÓÚ¿´xÊÇ·ñ´æÔÚ
-	string label;                        //labelµÄÌø×ªĞÅÏ¢£¬Òª½øÒ»²½¼Ó¹¤
+	int x = 0;                           //ç«‹å³æ•°æˆ–æ˜¯åç§»é‡
+	string label;                        //labelçš„è·³è½¬ä¿¡æ¯ï¼Œè¦è¿›ä¸€æ­¥åŠ å·¥
 
-	//ÔÚ´Ë´¦ÉèÁË³õÖµ
+	//åœ¨æ­¤å¤„è®¾äº†åˆå€¼
 	tmp_ins() {
 		for (int i = 0; i < 3; ++i) no_of_reg[i] = -1;
 	}
 };
 
 struct instruction {
-	int No;                 //²Ù×÷ÀàĞÍ,ÆäÖĞ°ÙÎ»ÄËÊÇÆäÑ¹½øÖ¸ÁîÀïµÄ²ÎÊı¸öÊı£¬Ç§Î»ÊÇËüËùÊôµÄº¯ÊıÀà±ğ¡£
-	//0ºÅ¼Ä´æÆ÷×¨´æĞ´ÈëµÄ¼Ä´æÆ÷
-	short no_of_reg[3];    
-	//Èı¸ö»áÓÃµ½µÄ¼Ä´æÆ÷µÄ±àºÅ(ÆäÖĞÒ»¸ö¼Ä´æÆ÷ÔÚlwµÈ²Ù×÷µÄÊ±ºò¿ÉÄÜ»á´æÈëÔ­Ê¼µÄÊı¾İµØÖ·¡£Èç¹ûÃ»´æÈëÄÇÒâÎ¶×ÅÊÇÓÃlabelËù´ú±íµÄÎ»ÖÃ·ÃÎÊ£©
-	int x;      //bool x_exist;               //Á¢¼´Êı»òÊÇÆ«ÒÆÁ¿£¨lwµÈ²Ù×÷£©
-	int label;                    //labelµÄÌø×ªĞòºÅ,Éæ¼°Ö¸ÁîµÄÌø×ªºÍ¾²Ì¬±äÁ¿µÄ·ÃÎÊ
+	int No;                 //æ“ä½œç±»å‹,å…¶ä¸­ç™¾ä½ä¹ƒæ˜¯å…¶å‹è¿›æŒ‡ä»¤é‡Œçš„å‚æ•°ä¸ªæ•°ï¼Œåƒä½æ˜¯å®ƒæ‰€å±çš„å‡½æ•°ç±»åˆ«ã€‚
+	//0å·å¯„å­˜å™¨ä¸“å­˜å†™å…¥çš„å¯„å­˜å™¨  
+	//ä¸‰ä¸ªä¼šç”¨åˆ°çš„å¯„å­˜å™¨çš„ç¼–å·(å…¶ä¸­ä¸€ä¸ªå¯„å­˜å™¨åœ¨lwç­‰æ“ä½œçš„æ—¶å€™å¯èƒ½ä¼šå­˜å…¥åŸå§‹çš„æ•°æ®åœ°å€ã€‚å¦‚æœæ²¡å­˜å…¥é‚£æ„å‘³ç€æ˜¯ç”¨labelæ‰€ä»£è¡¨çš„ä½ç½®è®¿é—®ï¼‰
+	short no_of_reg[3];  
+	int x;                        //ç«‹å³æ•°æˆ–æ˜¯åç§»é‡ï¼ˆlwç­‰æ“ä½œï¼‰
+	int label;                    //labelçš„è·³è½¬åºå·,æ¶‰åŠæŒ‡ä»¤çš„è·³è½¬å’Œé™æ€å˜é‡çš„è®¿é—®
 
 	instruction() {
 		//x_exist = false;
@@ -56,25 +56,25 @@ struct instruction {
 		No = obj.No;
 		for (int i = 0; i < 3; ++i) no_of_reg[i] = obj.no_of_reg[i];
 		x = obj.x;
-		if (obj.label.length() == 0) label = -1;              //×¢ÒâlabelÎª¿ÕÒ²±»¸Ä³ÉÁË-1
+		if (obj.label.length() == 0) label = -1;              //æ³¨æ„labelä¸ºç©ºä¹Ÿè¢«æ”¹æˆäº†-1
 		else label = label_local.find(obj.label) -> second;
 	}
 };
 
-//´æ·ÅÖ¸ÁîµÄµØÖ·
+//å­˜æ”¾æŒ‡ä»¤çš„åœ°å€
 deque<tmp_ins> tmp_txt;
 //deque<tmp_ins> text;
 deque<instruction> text;
-int main_start = 0;   //Õû¸öÖ¸Áî¿ªÊ¼µÄµØ·½
+int main_start = 0;   //æ•´ä¸ªæŒ‡ä»¤å¼€å§‹çš„åœ°æ–¹
 
-//»ù±¾Ó³Éä²Ù×÷µÄ´æ´¢µØ·½
+//åŸºæœ¬æ˜ å°„æ“ä½œçš„å­˜å‚¨åœ°æ–¹
 map<string, int> opr;
 map<string, int> reg;
 map<string, int> data_opr;
 
-//´ÓÕâÀï¿ªÊ¼ÊÇÊı¾İ¶ÁÈë²¿·Ö
-//Íê³ÉÊı¾İÊäÈëºÍÔ¤´¦Àí£¬ĞèÒª½«Õû¸ö´úÂë¶ÁÁ½±é    
-	void initialize();  //³õÊ¼µÄmap²Ù×÷µÈ¡£
+//ä»è¿™é‡Œå¼€å§‹æ˜¯æ•°æ®è¯»å…¥éƒ¨åˆ†
+//å®Œæˆæ•°æ®è¾“å…¥å’Œé¢„å¤„ç†ï¼Œéœ€è¦å°†æ•´ä¸ªä»£ç è¯»ä¸¤é    
+	void initialize();  //åˆå§‹çš„mapæ“ä½œç­‰ã€‚
 		void gt(char str[], char tmp[], int& count);
 		int to_int(char tmp[], int& count);
 		
@@ -109,50 +109,50 @@ map<string, int> data_opr;
 	void form_instruction(char command[], int& loca, char tmp[], int& count);
 void Input(char* a);
 
-//ÕâÊÇÄ£ÄâCPU²Ù×÷¿ªÊ¼µÄµØ·½
-//ÕâÊÇÒ»¸öÍ³Ò»µÄ´æ·ÅÎå¼¶Á÷Ë®Ôİ´æĞÅÏ¢µÄµØ·½£¬Í¬Ê±»áÓĞÒ»¸öÇå¿Õº¯Êı
-//Í¬Ê±ÎÒ»¹ĞèÒªÒ»¸ö¿ØÖÆÃüÁî·ÃÎÊµÄÈ«¾Ö²ÎÊı£¬À´Ä£ÄâPC¼Ä´æÆ÷
+//è¿™æ˜¯æ¨¡æ‹ŸCPUæ“ä½œå¼€å§‹çš„åœ°æ–¹
+//è¿™æ˜¯ä¸€ä¸ªç»Ÿä¸€çš„å­˜æ”¾äº”çº§æµæ°´æš‚å­˜ä¿¡æ¯çš„åœ°æ–¹ï¼ŒåŒæ—¶ä¼šæœ‰ä¸€ä¸ªæ¸…ç©ºå‡½æ•°
+//åŒæ—¶æˆ‘è¿˜éœ€è¦ä¸€ä¸ªæ§åˆ¶å‘½ä»¤è®¿é—®çš„å…¨å±€å‚æ•°ï¼Œæ¥æ¨¡æ‹ŸPCå¯„å­˜å™¨
 class performer {
 private:
 	struct product {
-		int instruct_address;                      //ÃüÁîÔÚÎÄ±¾ÖĞµÄÎ»ÖÃ£¬jalµÈ¿ÉÄÜ»áÊ¹ÓÃ
-		//instruction µÄ label ºÍ no_of_reg Èç¹ûÃ»ÓĞ£¬³õÖµÎª-1
-		instruction instruct;                      //Õâ¸ö¶«Î÷ÔÚµÚ¶ş²½Ö®ºóÓ¦¸Ã¾Í²»ÄÜÔÙ±»·ÃÎÊ
-		int num;                                   //²Ù×÷Âë
-		int reg_to_be_input[2] = { -1, -1 };       //´ı·ÅÈëµÄ¼Ä´æÆ÷ºÅ
-		int data_of_stage2[3] = { 0 };             //´ÓµÚ¶ş²½ÌáÈ¡³öµÄÈÎºÎĞÅÏ¢£¨²»¹»ÔÙ¼Ó£©
-		int ans_of_stage3[2] = { 0 };			   //µÚÈı²½µÄ½á¹û
-		int data_of_stage4 = 0;                    //´Ó¼Ä´æÆ÷Àï¶Á³öÀ´µÄÊı¾İ
+		int instruct_address;                      //å‘½ä»¤åœ¨æ–‡æœ¬ä¸­çš„ä½ç½®ï¼Œjalç­‰å¯èƒ½ä¼šä½¿ç”¨
+		//instruction çš„ label å’Œ no_of_reg å¦‚æœæ²¡æœ‰ï¼Œåˆå€¼ä¸º-1
+		instruction instruct;                      //è¿™ä¸ªä¸œè¥¿åœ¨ç¬¬äºŒæ­¥ä¹‹ååº”è¯¥å°±ä¸èƒ½å†è¢«è®¿é—®
+		int num;                                   //æ“ä½œç 
+		int reg_to_be_input[2] = { -1, -1 };       //å¾…æ”¾å…¥çš„å¯„å­˜å™¨å·
+		int data_of_stage2[3] = { 0 };             //ä»ç¬¬äºŒæ­¥æå–å‡ºçš„ä»»ä½•ä¿¡æ¯ï¼ˆä¸å¤Ÿå†åŠ ï¼‰
+		int ans_of_stage3[2] = { 0 };			   //ç¬¬ä¸‰æ­¥çš„ç»“æœ
+		int data_of_stage4 = 0;                    //ä»å¯„å­˜å™¨é‡Œè¯»å‡ºæ¥çš„æ•°æ®
 
 		void fresh() {
 			for (int i = 0; i <= 1; ++i) {
-				reg_to_be_input[i] = -1;            //²»¹»ÔÙ¼Ó
+				reg_to_be_input[i] = -1;            //ä¸å¤Ÿå†åŠ 
 				ans_of_stage3[i] = 0;
 			}
 		}
 	};
 
-	product order[5];    //Ç°¸ö½×¶ÎÖĞÃ¿¸ö½×¶ÎÖ´ĞĞÍêÖ®ºóµÄ½á¹ûÔİ´æ¡£Ã¿Ò»´ÎÖ´ĞĞ£¬ºóÒ»¼¶Ê¹ÓÃÇ°Ò»¼¶µÄÔİ´æ½á¹û
+	product order[5];    //å‰ä¸ªé˜¶æ®µä¸­æ¯ä¸ªé˜¶æ®µæ‰§è¡Œå®Œä¹‹åçš„ç»“æœæš‚å­˜ã€‚æ¯ä¸€æ¬¡æ‰§è¡Œï¼Œåä¸€çº§ä½¿ç”¨å‰ä¸€çº§çš„æš‚å­˜ç»“æœ
 
-	//¿ØÖÆÏÂÒ»ÌõÒª¶ÁÈ¡µÄÃüÁî
-	//PC¼Ä´æÆ÷¿ÉÒÔÓÃÀ´È·¶¨µÚÒ»½×¶ÎÊÇ·ñ¿ÉÒÔ·ÃÎÊ£¬£¨-1¼´Îª²»¿É·ÃÎÊ£©
+	//æ§åˆ¶ä¸‹ä¸€æ¡è¦è¯»å–çš„å‘½ä»¤
+	//PCå¯„å­˜å™¨å¯ä»¥ç”¨æ¥ç¡®å®šç¬¬ä¸€é˜¶æ®µæ˜¯å¦å¯ä»¥è®¿é—®ï¼Œï¼ˆ-1å³ä¸ºä¸å¯è®¿é—®ï¼‰
 	int PC_order = -1;
 
-	//ÒÔÏÂÎª´¦ÀíhazardËùĞèÒªµÄÒ»Ğ©Êı¾İ
+	//ä»¥ä¸‹ä¸ºå¤„ç†hazardæ‰€éœ€è¦çš„ä¸€äº›æ•°æ®
 
-	//´Ë±äÁ¿ÓÃÓÚ¿ØÖÆ³ÌĞòÊÇ·ñÒÑ¾­½áÊøÁË
+	//æ­¤å˜é‡ç”¨äºæ§åˆ¶ç¨‹åºæ˜¯å¦å·²ç»ç»“æŸäº†
 	bool finish = false;
-	//´Ë±äÁ¿ÓÃÓÚµ±Ç°½×¶ÎÊÇ·ñ´¦ÓÚcontrol hazard
+	//æ­¤å˜é‡ç”¨äºå½“å‰é˜¶æ®µæ˜¯å¦å¤„äºcontrol hazard
 	short control_hazard = 0;
-	//ÓÃÓÚÅĞ¶Ï¼Ä´æÆ÷ÊÇ·ñÕıÔÚ±»Ê¹ÓÃ	
+	//ç”¨äºåˆ¤æ–­å¯„å­˜å™¨æ˜¯å¦æ­£åœ¨è¢«ä½¿ç”¨	
 	short use_reg[34] = { 0 };
-	//´Ë±äÁ¿ÓÃÓÚµ±Ç°½×¶ÎÊÇ·ñ´¦ÓÚdata hazard
+	//æ­¤å˜é‡ç”¨äºå½“å‰é˜¶æ®µæ˜¯å¦å¤„äºdata hazard
 	short data_hazard = 0;
-	//½«½×¶ÎĞÅÏ¢Íâ´æ¡£´ËĞÅÏ¢ÓÃÀ´±£´æ
+	//å°†é˜¶æ®µä¿¡æ¯å¤–å­˜ã€‚æ­¤ä¿¡æ¯ç”¨æ¥ä¿å­˜
 	bool can_read[5] = { false };
 
-	//Ò»ÏÂÊÇÒ»Ğ©¹¤¾ßº¯Êı£º
-	//ÓÃÓÚµÚ¶ş½×¶ÎµÄÁ÷Ë®£»
+	//ä¸€ä¸‹æ˜¯ä¸€äº›å·¥å…·å‡½æ•°ï¼š
+	//ç”¨äºç¬¬äºŒé˜¶æ®µçš„æµæ°´ï¼›
 	//void other_prepare(product& obj);
 	//int reg_prepare(product& obj);
 	int decode_0(performer::product& obj);
@@ -169,7 +169,7 @@ private:
 		&performer::decode_3, &performer::decode_4, &performer::decode_5, &performer::decode_6, &performer::decode_7,
 		&performer::decode_8, &performer::decode_9 };
 
-	//ÓÃÓÚµÚÈı½×¶Î
+	//ç”¨äºç¬¬ä¸‰é˜¶æ®µ
 	void add(product& obj) { obj.ans_of_stage3[0] = obj.data_of_stage2[0] + obj.data_of_stage2[1]; }
 	void addu(product& obj) { obj.ans_of_stage3[0] = unsigned(obj.data_of_stage2[0]) + unsigned(obj.data_of_stage2[1]); }
 	void addiu(product& obj) { add(obj); }
@@ -263,32 +263,32 @@ public:
 	}
 	bool end() { return finish; }
 
-	//µÚËÄ ¡¢ Îå½×¶Î»ù±¾ÉÏ²»Ê¹ÓÃº¯ÊıÖ¸ÕëÀ´ÊµÏÖ
-	//×¢Òâ£ºµÚÎå½×¶Î²»ÔÙĞèÒª¿¼ÂÇÏÂÒ»¼¶ÊÇ·ñÄÜ·ÃÎÊ
+	//ç¬¬å›› ã€ äº”é˜¶æ®µåŸºæœ¬ä¸Šä¸ä½¿ç”¨å‡½æ•°æŒ‡é’ˆæ¥å®ç°
+	//æ³¨æ„ï¼šç¬¬äº”é˜¶æ®µä¸å†éœ€è¦è€ƒè™‘ä¸‹ä¸€çº§æ˜¯å¦èƒ½è®¿é—®
 	void Write_Bk() {
 		if (!finish && can_read[4]) {
-			//Ğ´»Ø²Ù×÷
-			//Ğ´Íê¼ÇµÃÉèÖÃuse_reg
+			//å†™å›æ“ä½œ
+			//å†™å®Œè®°å¾—è®¾ç½®use_reg
 			order[4] = order[3];
 
 			int num = order[4].instruct.No % 100;
-			if (23 <= num && num <= 39) {   //Ìø×ªÖ¸Áî
+			if (23 <= num && num <= 39) {   //è·³è½¬æŒ‡ä»¤
 				--control_hazard;
 				if (order[4].ans_of_stage3[0]) {
 					PC_order = order[4].data_of_stage2[2];
 
-					if (38 <= num && num <= 39) {  //Èç¹ûÊÇjal/jalr
+					if (38 <= num && num <= 39) {  //å¦‚æœæ˜¯jal/jalr
 						rgstr[order[4].reg_to_be_input[0]] = order[4].instruct_address + 1;
 						--use_reg[order[4].reg_to_be_input[0]];
 					}
 				}
 			}
-			else if (40 <= num && num <= 43) {  //load ÃüÁî
+			else if (40 <= num && num <= 43) {  //load å‘½ä»¤
 				rgstr[order[4].reg_to_be_input[0]] = order[4].data_of_stage4;
 				--use_reg[order[4].reg_to_be_input[0]];
 			}
 			else {
-				if (num == 51) {           //syscall¿ÉÄÜ½áÊøÕû¸öÃüÁî
+				if (num == 51) {           //syscallå¯èƒ½ç»“æŸæ•´ä¸ªå‘½ä»¤
 					if (order[4].data_of_stage2[2] == 10 || order[4].data_of_stage2[2] == 17) {
 						finish = true;
 					}
@@ -307,7 +307,7 @@ public:
 		if (!finish && can_read[3]) {
 			order[3] = order[2];
 			int no = order[2].num % 100;
-			if (40 <= no && no <= 43) {    //loadÃüÁî
+			if (40 <= no && no <= 43) {    //loadå‘½ä»¤
 				if (no == 40) order[3].data_of_stage4 = order[3].ans_of_stage3[0];
 				else if (no == 41) order[3].data_of_stage4 = Memory[order[3].ans_of_stage3[0]];
 				else if (no == 42) order[3].data_of_stage4 = *((short*)(Memory + order[3].ans_of_stage3[0]));
@@ -316,8 +316,8 @@ public:
 			}
 			else if (44 <= no && no <= 46) {  //store
 				if (no == 44) Memory[order[3].ans_of_stage3[0]] = order[3].data_of_stage2[2];
-				else if (no == 45) new (static_cast<void*> (&Memory[order[3].ans_of_stage3[0]])) short(order[3].data_of_stage2[2]);  //·ÃÎÊÄÚ´æ
-				else if (no == 46) new (static_cast<void*> (&Memory[order[3].ans_of_stage3[0]])) int(order[3].data_of_stage2[2]);    //·ÃÎÊÄÚ´æ
+				else if (no == 45) new (static_cast<void*> (&Memory[order[3].ans_of_stage3[0]])) short(order[3].data_of_stage2[2]);  //è®¿é—®å†…å­˜
+				else if (no == 46) new (static_cast<void*> (&Memory[order[3].ans_of_stage3[0]])) int(order[3].data_of_stage2[2]);    //è®¿é—®å†…å­˜
 			}
 			else if (no == 51) {
 				if (order[3].ans_of_stage3[1] == -10) {
@@ -326,22 +326,22 @@ public:
 					int len = strlen(tmp);
 					int address = order[3].data_of_stage2[0];
 					for (int i = 0; i <= len; ++i) {
-						new (static_cast<void*> (&Memory[address++])) char(tmp[i]);    //·ÃÎÊÄÚ´æÁË
+						new (static_cast<void*> (&Memory[address++])) char(tmp[i]);    //è®¿é—®å†…å­˜äº†
 					}
 				}
 			}
 			can_read[4] = true;
 		}
 		else can_read[4] = false;
-		//load: °ÑÄÚ´æµØÖ·µÄÊı¾İÈ¡³ö
-		//store : ½«Êı¾İĞ´ÈëÄÚ´æÖĞ£¨Õâ¸öÊ±ºòÊı¾İÔçÒÑ¾­´Ó¼Ä´æÆ÷ÖĞ¶ÁÁË³öÀ´
+		//load: æŠŠå†…å­˜åœ°å€çš„æ•°æ®å–å‡º
+		//store : å°†æ•°æ®å†™å…¥å†…å­˜ä¸­ï¼ˆè¿™ä¸ªæ—¶å€™æ•°æ®æ—©å·²ç»ä»å¯„å­˜å™¨ä¸­è¯»äº†å‡ºæ¥
 	}
 
 	void Execution() {
 		if (!finish && can_read[2]) {
 			order[2] = order[1];
 			int no = order[2].num % 100;
-			(this->*excute[no])(order[2]);//ÀàÖĞÊ¹ÓÃº¯ÊıÖ¸ÕëµÄÑùÊ½
+			(this->*excute[no])(order[2]);//ç±»ä¸­ä½¿ç”¨å‡½æ•°æŒ‡é’ˆçš„æ ·å¼
 
 			can_read[3] = true;
 		}
@@ -351,13 +351,13 @@ public:
 		if (!finish) {
 			if (can_read[1] && !data_hazard && !control_hazard) {
 				order[1] = order[0];
-				//0£º·Ç¿ØÖÆÇÒ¶ÁÈ¡Ê§°Ü£¬ 1£º¼ÈÊÇ¿ØÖÆÃüÁîÓÖ¶ÁÈ¡Ê§°Ü£¬ 2£º¿ØÖÆÇÒ¶ÁÈ¡³É¹¦£¬3£º·Ç¿ØÖÆÇÒ¶ÁÈ¡³É¹¦¡£
+				//0ï¼šéæ§åˆ¶ä¸”è¯»å–å¤±è´¥ï¼Œ 1ï¼šæ—¢æ˜¯æ§åˆ¶å‘½ä»¤åˆè¯»å–å¤±è´¥ï¼Œ 2ï¼šæ§åˆ¶ä¸”è¯»å–æˆåŠŸï¼Œ3ï¼šéæ§åˆ¶ä¸”è¯»å–æˆåŠŸã€‚
 				int stage;
-				if (order[1].num % 100 != 50) stage = (this->*decode[(order[0].num / 100) % 10])(order[1]);         //ÓÃÓÚºóĞøÇø±ğ£»
+				if (order[1].num % 100 != 50) stage = (this->*decode[(order[0].num / 100) % 10])(order[1]);         //ç”¨äºåç»­åŒºåˆ«ï¼›
 				else stage = 3;
 
 				switch (stage) {
-					//0£º·Ç¿ØÖÆÇÒ¶ÁÈ¡Ê§°Ü£¬ 1£º¼ÈÊÇ¿ØÖÆÃüÁîÓÖ¶ÁÈ¡Ê§°Ü£¬ 2£º¿ØÖÆÇÒ¶ÁÈ¡³É¹¦£¬3£º·Ç¿ØÖÆÇÒ¶ÁÈ¡³É¹¦¡£
+					//0ï¼šéæ§åˆ¶ä¸”è¯»å–å¤±è´¥ï¼Œ 1ï¼šæ—¢æ˜¯æ§åˆ¶å‘½ä»¤åˆè¯»å–å¤±è´¥ï¼Œ 2ï¼šæ§åˆ¶ä¸”è¯»å–æˆåŠŸï¼Œ3ï¼šéæ§åˆ¶ä¸”è¯»å–æˆåŠŸã€‚
 				case 0: ++data_hazard; can_read[2] = false; break;
 				case 2: ++control_hazard; can_read[2] = true; break;
 				case 1: ++data_hazard; ++control_hazard; can_read[2] = false; break;
@@ -365,9 +365,9 @@ public:
 				}
 			}
 			else {
-				//ÎŞÂÛÊÇ·ñcontrol_hazard£¬ÖÁÉÙÊı¾İ¶¼¿ÉÒÔÍùÉÏµİÁË£¨can_read[1]¶¼¿ÉÖÃÎª1ÁË£©
+				//æ— è®ºæ˜¯å¦control_hazardï¼Œè‡³å°‘æ•°æ®éƒ½å¯ä»¥å¾€ä¸Šé€’äº†ï¼ˆcan_read[1]éƒ½å¯ç½®ä¸º1äº†ï¼‰
 				if (data_hazard) {
-					//·ÃÎÊ¼Ä´æÆ÷³É¹¦
+					//è®¿é—®å¯„å­˜å™¨æˆåŠŸ
 					if ((this->*decode[(order[0].num / 100) % 10])(order[1]) >= 2) {
 						--data_hazard;
 						can_read[2] = true;
@@ -380,7 +380,7 @@ public:
 	}
 
 	void Ins_Fetch() {
-		//ÖîÈçÒÑ¾­·¢³ö½áÊøÃüÁîÖ®ÀàµÄ¾Í²»ÔÙload¡£hazardµÈÒ²ÊÇĞèÒª¿¼
+		//è¯¸å¦‚å·²ç»å‘å‡ºç»“æŸå‘½ä»¤ä¹‹ç±»çš„å°±ä¸å†loadã€‚hazardç­‰ä¹Ÿæ˜¯éœ€è¦è€ƒ
 		if (can_read[0] && !finish && !control_hazard && !data_hazard) {
 			order[0].fresh();
 			order[0].instruct = text[PC_order];
@@ -395,45 +395,45 @@ public:
 	}
 };
 
-//ÓÃÓÚÒ»¸öĞ´Èë¼Ä´æÆ÷ + Ò»¸ö¶ÁÈë¼Ä´æÆ÷ + ¶ÁÈë¼Ä´æÆ÷ / Á¢¼´Êı
+//ç”¨äºä¸€ä¸ªå†™å…¥å¯„å­˜å™¨ + ä¸€ä¸ªè¯»å…¥å¯„å­˜å™¨ + è¯»å…¥å¯„å­˜å™¨ / ç«‹å³æ•°
 int performer::decode_0(performer::product& obj) {
-	//¼ì²é¶ÁÈë¼Ä´æÆ÷Ê¹ÓÃÇé¿ö
+	//æ£€æŸ¥è¯»å…¥å¯„å­˜å™¨ä½¿ç”¨æƒ…å†µ
 	for (int i = 1; i <= 2; ++i) {
 		if (obj.instruct.no_of_reg[i] != -1) {
 			if (use_reg[obj.instruct.no_of_reg[i]]) return 0;
 		}
 	}
-	//´ËÎª½«Êı¾İ¶ÁÈë
+	//æ­¤ä¸ºå°†æ•°æ®è¯»å…¥
 	for (int i = 1; i <= 2; ++i) {
 		//use_reg[obj.instruct.no_of_reg[i]] = true;
 		if (obj.instruct.no_of_reg[i] != -1) obj.data_of_stage2[i - 1] = rgstr[obj.instruct.no_of_reg[i]];
 		else obj.data_of_stage2[i - 1] = obj.instruct.x;
 	}
-	//È·¶¨Ğ´ÈëµÄ¼Ä´æÆ÷
+	//ç¡®å®šå†™å…¥çš„å¯„å­˜å™¨
 	obj.reg_to_be_input[0] = obj.instruct.no_of_reg[0];
 	++use_reg[obj.reg_to_be_input[0]];
 	return 3;
 }
 
-//ÓÃÓÚdiv / mulµÈ
+//ç”¨äºdiv / mulç­‰
 int performer::decode_1(performer::product& obj) {
-	//¼ì²é¶ÁÈë¼Ä´æÆ÷Ê¹ÓÃÇé¿ö
+	//æ£€æŸ¥è¯»å…¥å¯„å­˜å™¨ä½¿ç”¨æƒ…å†µ
 	for (int i = 1; i <= 2; ++i) {
 		if (obj.instruct.no_of_reg[i] != -1) {
 			if (use_reg[obj.instruct.no_of_reg[i]]) return 0;
 		}
 	}
-	//´ËÎª½«Êı¾İ¶ÁÈë
+	//æ­¤ä¸ºå°†æ•°æ®è¯»å…¥
 	for (int i = 1; i <= 2; ++i) {
 		//use_reg[obj.instruct.no_of_reg[i]] = true;
 		if (obj.instruct.no_of_reg[i] != -1) obj.data_of_stage2[i - 1] = rgstr[obj.instruct.no_of_reg[i]];
 		else obj.data_of_stage2[i - 1] = obj.instruct.x;
 	}
 
-	//È·¶¨Ğ´Èë¼Ä´æÆ÷
-	if (obj.instruct.no_of_reg[0] == -1) {       //Ã»ÓĞÖ¸¶¨Ğ´ÈëµÄ¼Ä´æÆ÷(0ºÅ¼Ä´æÆ÷¾ÍÊÇÓÃÀ´Ğ´ÈëµÄ)
-		obj.reg_to_be_input[0] = 32;             //32ÊÇlow
-		obj.reg_to_be_input[1] = 33;             //33ÊÇhigh
+	//ç¡®å®šå†™å…¥å¯„å­˜å™¨
+	if (obj.instruct.no_of_reg[0] == -1) {       //æ²¡æœ‰æŒ‡å®šå†™å…¥çš„å¯„å­˜å™¨(0å·å¯„å­˜å™¨å°±æ˜¯ç”¨æ¥å†™å…¥çš„)
+		obj.reg_to_be_input[0] = 32;             //32æ˜¯low
+		obj.reg_to_be_input[1] = 33;             //33æ˜¯high
 		++use_reg[32]; ++use_reg[33];
 	}
 	else {
@@ -443,32 +443,32 @@ int performer::decode_1(performer::product& obj) {
 	return 3;
 }
 
-//Ò»¸öĞ´Èë¼Ä´æÆ÷ + Ò»¸ö¶ÁÈë¼Ä´æÆ÷ / Á¢¼´Êı(¼ÇµÃ´øÉÏmove)
+//ä¸€ä¸ªå†™å…¥å¯„å­˜å™¨ + ä¸€ä¸ªè¯»å…¥å¯„å­˜å™¨ / ç«‹å³æ•°(è®°å¾—å¸¦ä¸Šmove)
 int performer::decode_2(performer::product& obj) {
-	//¼ì²é¶ÁÈë¼Ä´æÆ÷
+	//æ£€æŸ¥è¯»å…¥å¯„å­˜å™¨
 	if (obj.instruct.no_of_reg[1] != -1) {
 		if (use_reg[obj.instruct.no_of_reg[1]]) return 0;
 	}
 
-	//½«Êı¾İ¶ÁÈë
+	//å°†æ•°æ®è¯»å…¥
 	if (obj.instruct.no_of_reg[1] != -1) obj.data_of_stage2[0] = rgstr[obj.instruct.no_of_reg[1]];
 	else obj.data_of_stage2[0] = obj.instruct.x;
 
-	//È·¶¨Ğ´Èë¼Ä´æÆ÷
+	//ç¡®å®šå†™å…¥å¯„å­˜å™¨
 	obj.reg_to_be_input[0] = obj.instruct.no_of_reg[0];
 	++use_reg[obj.reg_to_be_input[0]];
 	return 3;
 }
 
-//·ÇjÌø×ªÃüÁî: Ò»¸ö¶ÁÈë¼Ä´æÆ÷ + ¶ÁÈë¼Ä´æÆ÷ / Á¢¼´Êı
+//éjè·³è½¬å‘½ä»¤: ä¸€ä¸ªè¯»å…¥å¯„å­˜å™¨ + è¯»å…¥å¯„å­˜å™¨ / ç«‹å³æ•°
 int performer::decode_3(performer::product& obj) {
-	//¼ì²é¶ÁÈë¼Ä´æÆ÷
+	//æ£€æŸ¥è¯»å…¥å¯„å­˜å™¨
 	for (int i = 1; i <= 2; ++i) {
 		if (obj.instruct.no_of_reg[i] != -1) {
 			if (use_reg[obj.instruct.no_of_reg[i]]) return 1;
 		}
 	}
-	//´ËÎª½«Êı¾İ¶ÁÈë
+	//æ­¤ä¸ºå°†æ•°æ®è¯»å…¥
 	for (int i = 1; i <= 2; ++i) {
 		if (obj.instruct.no_of_reg[i] != -1) obj.data_of_stage2[i - 1] = rgstr[obj.instruct.no_of_reg[i]];
 		else obj.data_of_stage2[i - 1] = obj.instruct.x;
@@ -478,7 +478,7 @@ int performer::decode_3(performer::product& obj) {
 	return 2;
 }
 
-// ·ÇjÌø×ªÃüÁî: Ò»¸ö¶ÁÈë¼Ä´æÆ÷
+// éjè·³è½¬å‘½ä»¤: ä¸€ä¸ªè¯»å…¥å¯„å­˜å™¨
 int performer::decode_4(performer::product& obj) {
 	if (use_reg[obj.instruct.no_of_reg[1]]) return 1;
 	obj.data_of_stage2[0] = rgstr[obj.instruct.no_of_reg[1]];
@@ -497,7 +497,7 @@ int performer::decode_5(performer::product& obj) {
 	}
 	else obj.data_of_stage2[2] = obj.instruct.label;
 
-	if (obj.num % 100 == 38 || obj.num % 100 == 39) {    //jalÃüÁî / jalr
+	if (obj.num % 100 == 38 || obj.num % 100 == 39) {    //jalå‘½ä»¤ / jalr
 		obj.reg_to_be_input[0] = 31;
 		++use_reg[obj.reg_to_be_input[0]];
 	}
@@ -510,12 +510,12 @@ int performer::decode_6(performer::product& obj) {
 	if (obj.num % 100 == 48) use = 33;
 	else if (obj.num % 100 == 49) use = 32;
 	
-	if (use_reg[use]) return 0;  //¼ì²é¶ÁÈë¼Ä´æÆ÷Ê¹ÓÃÇé¿ö
+	if (use_reg[use]) return 0;  //æ£€æŸ¥è¯»å…¥å¯„å­˜å™¨ä½¿ç”¨æƒ…å†µ
 	else {
 		//use_reg[33] = true;
-		//¶ÁÈëÊı¾İ
+		//è¯»å…¥æ•°æ®
 		obj.data_of_stage2[0] = rgstr[use];
-		//×¼±¸Ğ´ÈëµÄ¼Ä´æÆ÷
+		//å‡†å¤‡å†™å…¥çš„å¯„å­˜å™¨
 		obj.reg_to_be_input[0] = obj.instruct.no_of_reg[0];
 		++use_reg[obj.reg_to_be_input[0]];
 		return 3;
@@ -525,18 +525,18 @@ int performer::decode_6(performer::product& obj) {
 //load
 int performer::decode_7(performer::product& obj) {
 	if (obj.instruct.no_of_reg[1] != -1) {
-		if (use_reg[obj.instruct.no_of_reg[1]]) return 0;   //Êı¾İ¶ÁÈë
-		else {  //×¼±¸Êı¾İ
+		if (use_reg[obj.instruct.no_of_reg[1]]) return 0;   //æ•°æ®è¯»å…¥
+		else {  //å‡†å¤‡æ•°æ®
 			obj.data_of_stage2[0] = rgstr[obj.instruct.no_of_reg[1]];
 			obj.data_of_stage2[1] = obj.instruct.x;
 		}
 	}
-	else {  //×¼±¸Êı¾İ
+	else {  //å‡†å¤‡æ•°æ®
 		obj.data_of_stage2[0] = obj.instruct.label;
 		obj.data_of_stage2[1] = 0;
 	}
 
-	//½«ÒªĞ´ÈëµÄ¼Ä´æÆ÷
+	//å°†è¦å†™å…¥çš„å¯„å­˜å™¨
 	obj.reg_to_be_input[0] = obj.instruct.no_of_reg[0];
 	++use_reg[obj.reg_to_be_input[0]];
 	return 3;
@@ -544,15 +544,15 @@ int performer::decode_7(performer::product& obj) {
 
 //store
 int performer::decode_8(performer::product& obj) {
-	//¼ì²é¶ÁÈë¼Ä´æÆ÷Ê¹ÓÃÇé¿ö
+	//æ£€æŸ¥è¯»å…¥å¯„å­˜å™¨ä½¿ç”¨æƒ…å†µ
 	for (int i = 1; i <= 2; ++i) {
 		if (obj.instruct.no_of_reg[i] != -1) {
 			if (use_reg[obj.instruct.no_of_reg[i]]) return 0;
 		}
 	}
-	//´ËÎª½«Êı¾İ¶ÁÈë
+	//æ­¤ä¸ºå°†æ•°æ®è¯»å…¥
 
-	obj.data_of_stage2[2] = rgstr[obj.instruct.no_of_reg[1]];     //¶şºÅ»º´æÇø·ÅÒªĞ´ÈëÄÚ´æµÄÊı¾İ
+	obj.data_of_stage2[2] = rgstr[obj.instruct.no_of_reg[1]];     //äºŒå·ç¼“å­˜åŒºæ”¾è¦å†™å…¥å†…å­˜çš„æ•°æ®
 	if (obj.instruct.no_of_reg[2] != -1) {
 		obj.data_of_stage2[0] = rgstr[obj.instruct.no_of_reg[2]];
 		obj.data_of_stage2[1] = obj.instruct.x;
@@ -565,12 +565,12 @@ int performer::decode_8(performer::product& obj) {
 }
 
 //syscall
-//¹æ¶¨µ÷ÓÃÃüÁî·ÅÔÚ2ºÅÊı¾İÔİ´æÇø
+//è§„å®šè°ƒç”¨å‘½ä»¤æ”¾åœ¨2å·æ•°æ®æš‚å­˜åŒº
 int performer::decode_9(performer::product& obj) {
 	if (use_reg[reg["$v0"]]) return 0;
 	else {
 		int choice = rgstr[reg["$v0"]];
-		obj.data_of_stage2[2] = choice;       //syscallµÄÑ¡ÔñÒ²ÊÇ·ÅÔÚ2ºÅ»º´æÇø
+		obj.data_of_stage2[2] = choice;       //syscallçš„é€‰æ‹©ä¹Ÿæ˜¯æ”¾åœ¨2å·ç¼“å­˜åŒº
 		if (choice == 1 || choice == 4) {
 			if (use_reg[reg["$a0"]]) return 0;
 			else {
@@ -616,13 +616,13 @@ int performer::decode_9(performer::product& obj) {
 	}
 }
 
-//´¦ÀíµÄÊÇ£º Á¢¼´Êı/Æ«ÒÆÁ¿ + ÒªĞ´ÈëµÄ¼Ä´æÆ÷
-//syscallµÄµÚÈı²½ÊµÏÖ
-void performer::syscall(performer::product& obj) {  //¼ÇµÃ¸Ä»ØÒıÓÃ
+//å¤„ç†çš„æ˜¯ï¼š ç«‹å³æ•°/åç§»é‡ + è¦å†™å…¥çš„å¯„å­˜å™¨
+//syscallçš„ç¬¬ä¸‰æ­¥å®ç°
+void performer::syscall(performer::product& obj) {  //è®°å¾—æ”¹å›å¼•ç”¨
 	int loca; 
 	switch (obj.data_of_stage2[2])
 	{
-	case 1:cout << obj.data_of_stage2[0]; break;   //ÏÈ¼Ó»»ĞĞ·û£¬·½±ãµ÷ÊÔ
+	case 1:cout << obj.data_of_stage2[0]; break;   //å…ˆåŠ æ¢è¡Œç¬¦ï¼Œæ–¹ä¾¿è°ƒè¯•
 	case 4:
 		loca = obj.data_of_stage2[0];
 		while (Memory[loca] != '\0') {
@@ -630,7 +630,7 @@ void performer::syscall(performer::product& obj) {  //¼ÇµÃ¸Ä»ØÒıÓÃ
 		}
 		break;
 	case 5:cin >> obj.ans_of_stage3[0]; break;
-	case 8:obj.ans_of_stage3[1] = -10; break;//È¡Ò»¸öÌØÊâÖµÀ´Ê¹ÆäÔÚµÚ4½×¶ÎÖ´ĞĞÄÚ´æ·ÃÎÊ break;//È¡Ò»¸öÌØÊâÖµÀ´Ê¹ÆäÔÚµÚ4½×¶ÎÖ´ĞĞÄÚ´æ·ÃÎÊ
+	case 8:obj.ans_of_stage3[1] = -10; break;//å–ä¸€ä¸ªç‰¹æ®Šå€¼æ¥ä½¿å…¶åœ¨ç¬¬4é˜¶æ®µæ‰§è¡Œå†…å­˜è®¿é—® break;//å–ä¸€ä¸ªç‰¹æ®Šå€¼æ¥ä½¿å…¶åœ¨ç¬¬4é˜¶æ®µæ‰§è¡Œå†…å­˜è®¿é—®
 	case 9:
 		if (fp % 4 != 0) {
 			int k = fp / 4 + 1;
@@ -643,22 +643,22 @@ void performer::syscall(performer::product& obj) {  //¼ÇµÃ¸Ä»ØÒıÓÃ
 	}
 }
 
-//Íê³ÉÕû¸öÄ£Äâ²Ù×÷
+//å®Œæˆæ•´ä¸ªæ¨¡æ‹Ÿæ“ä½œ
 void Performance();
 
 int main(int argc, char** argv)
 {
 	Input(argv[1]);
 
-	rgstr[reg["$sp"]] = sp;                     //ÔÚ¾²Ì¬±äÁ¿¸³Öµ½áÊøÒÔºóÂíÉÏ½«Õ»¿Õ¼äµÄ×îºóÒ»¸ö¸³Öµ¸øËû¡£ÔÚÁ÷Ë®Ïß¿ªÊ¼Ö®Ç°
-	main_start = label_local["main"];           //È·¶¨Õû¸öÖ¸Áî¿ªÊ¼µÄµØ·½¡£
+	rgstr[reg["$sp"]] = sp;                     //åœ¨é™æ€å˜é‡èµ‹å€¼ç»“æŸä»¥åé©¬ä¸Šå°†æ ˆç©ºé—´çš„æœ€åä¸€ä¸ªèµ‹å€¼ç»™ä»–ã€‚åœ¨æµæ°´çº¿å¼€å§‹ä¹‹å‰
+	main_start = label_local["main"];           //ç¡®å®šæ•´ä¸ªæŒ‡ä»¤å¼€å§‹çš„åœ°æ–¹ã€‚
 
 	Performance();
 	return 0;
 }
 
-//Íê³É»ù±¾µÄmap²Ù×÷
-//±àÂëÉæ¼°Äã¶ÔÓÚÎå¼¶¼Ü¹¹µÄÉèÏë
+//å®ŒæˆåŸºæœ¬çš„mapæ“ä½œ
+//ç¼–ç æ¶‰åŠä½ å¯¹äºäº”çº§æ¶æ„çš„è®¾æƒ³
 void initialize() {
 	reg["$zero"] = 0; reg["$0"] = 0;
 	reg["$at"] = 1; reg["$1"] = 1;
@@ -730,22 +730,22 @@ void initialize() {
 	data_opr[".text"] = 8;
 }
 
-//Íê³ÉÊı¾İÊäÈëºÍÔ¤´¦Àí£¬ĞèÒª½«Õû¸ö´úÂë¶ÁÁ½±é
+//å®Œæˆæ•°æ®è¾“å…¥å’Œé¢„å¤„ç†ï¼Œéœ€è¦å°†æ•´ä¸ªä»£ç è¯»ä¸¤é
 void Input(char * a)
 {
 	ifstream fin(a);
 	initialize();
 
 	char tmp[MAX_SIZE];
-	bool deal_flag = true;  //false ±íÊ¾ÕıÔÚ´¦ÀídataÇøµÄÊı¾İ£¬ true ±íÊ¾ÕıÔÚ´¦ÀítextÇøµÄÊı¾İ
-	int loca = 0;           //ÓÃÀ´Í³¼Æµ±Ç°ÃüÁîÌõÊı
+	bool deal_flag = true;  //false è¡¨ç¤ºæ­£åœ¨å¤„ç†dataåŒºçš„æ•°æ®ï¼Œ true è¡¨ç¤ºæ­£åœ¨å¤„ç†textåŒºçš„æ•°æ®
+	int loca = 0;           //ç”¨æ¥ç»Ÿè®¡å½“å‰å‘½ä»¤æ¡æ•°
 	
 	map<string, int>::iterator opr_itr;
 	while (fin.getline(tmp, MAX_SIZE)) {
 		int count = 0;
-		int len = strlen(tmp);       //len±íÊ¾tmpµÄ×Ö·û´®³¤¶È
+		int len = strlen(tmp);       //lenè¡¨ç¤ºtmpçš„å­—ç¬¦ä¸²é•¿åº¦
 		while (count < len) {
-			char str[500];           //¶ÁÈëÒ»Ìõ¿ÉÄÜÊÇÃüÁî£¬¿ÉÄÜÊÇlabelµÄ×Ö·û¶Î
+			char str[500];           //è¯»å…¥ä¸€æ¡å¯èƒ½æ˜¯å‘½ä»¤ï¼Œå¯èƒ½æ˜¯labelçš„å­—ç¬¦æ®µ
 			
 			while ((tmp[count] == ' ' || tmp[count] == '\t' || tmp[count] == '\0') && count < len) ++count;
 			if (count >= len) break;
@@ -762,7 +762,7 @@ void Input(char * a)
 				}
 				else {
 					form_instruction(str, loca, tmp, count); break; 
-					//ÔÚÍê³ÉÁËÃüÁîĞÎ³ÉÒÔºóÕâÒ»ĞĞÒ»¶¨Ã»ÓĞ¶«Î÷ÁË
+					//åœ¨å®Œæˆäº†å‘½ä»¤å½¢æˆä»¥åè¿™ä¸€è¡Œä¸€å®šæ²¡æœ‰ä¸œè¥¿äº†
 				}
 			}
 		}
@@ -787,16 +787,16 @@ void Performance()
 	}
 }
 
-//×¢Òâgtº¯ÊıÊÇÌø¿Õ¸ñµÄ£¬µ«Ö»ÄÜÊÇÕë¶ÔºóÃæÒ»¶¨ÓĞÃüÁîµÄÊ±ºò£¡¼ì²éËùÓĞgtº¯Êı
-//Ò»µ©µ÷ÓÃgtº¯Êı£¬ÒâÎ¶×ÅÔÚÄãµÄÃüÁîÖ®Ç°µÄĞÅÏ¢¶ÔÓÚÄã¶¼ÒÑ¾­Ã»ÓĞ×÷ÓÃÁË
-//É¶ÃüÁîÃ»¶Áµ½¸østrÒ»¸öNULL
+//æ³¨æ„gtå‡½æ•°æ˜¯è·³ç©ºæ ¼çš„ï¼Œä½†åªèƒ½æ˜¯é’ˆå¯¹åé¢ä¸€å®šæœ‰å‘½ä»¤çš„æ—¶å€™ï¼æ£€æŸ¥æ‰€æœ‰gtå‡½æ•°
+//ä¸€æ—¦è°ƒç”¨gtå‡½æ•°ï¼Œæ„å‘³ç€åœ¨ä½ çš„å‘½ä»¤ä¹‹å‰çš„ä¿¡æ¯å¯¹äºä½ éƒ½å·²ç»æ²¡æœ‰ä½œç”¨äº†
+//å•¥å‘½ä»¤æ²¡è¯»åˆ°ç»™strä¸€ä¸ªNULL
 void gt(char str[], char tmp[], int & count)
 {
 	int i = 0; int len = strlen(tmp);
 	while ((tmp[count] == ' ' || tmp[count] == '\t' || tmp[count] == ',' || tmp[count] == '\0' || tmp[count] == '\"' || tmp[count] == '(' )&& count < len) ++count;
 	
 	bool use_flag = false;
-	//¿ÉÒÔ¿¼ÂÇ¸Ä½ø¹ØÓÚ¡®#¡¯µÄÄÚÈİ
+	//å¯ä»¥è€ƒè™‘æ”¹è¿›å…³äºâ€˜#â€™çš„å†…å®¹
 	while (tmp[count] != ' ' && tmp[count] != '\t' && tmp[count] != ',' && tmp[count] != ':' && tmp[count] != ')' && tmp[count] != '\0' && tmp[count] != '"' && count < len) {
 		use_flag = true;
 		str[i++] = tmp[count++];
@@ -804,7 +804,7 @@ void gt(char str[], char tmp[], int & count)
 	str[i] = NULL;
 }
 
-//to_int Ò²ÊÇÌø¿Õ¸ñº¯Êı£¬×¢Òâ·ÃÎÊÊ±Îñ±Ø±£Ö¤ºóÃæÓĞÊı×Ö
+//to_int ä¹Ÿæ˜¯è·³ç©ºæ ¼å‡½æ•°ï¼Œæ³¨æ„è®¿é—®æ—¶åŠ¡å¿…ä¿è¯åé¢æœ‰æ•°å­—
 int to_int(char tmp[], int& count)
 {
 	int ans = 0;
@@ -869,7 +869,7 @@ void alloc(char tmp[], int & count, int len) {
 		if (str[0] != NULL && str[0] != '#') {
 			int a = 0;
 			num = to_int(str, a);
-			new (static_cast<void*> (&Memory[fp])) int(num);  //·ÃÎÊÄÚ´æ
+			new (static_cast<void*> (&Memory[fp])) int(num);  //è®¿é—®å†…å­˜
 			fp += len;
 		}
 	} while (str[0] != NULL && str[0] != '#');
@@ -882,11 +882,11 @@ void space_(char tmp[], int & count, bool & deal_flag) { fp += to_int(tmp, count
 void data_(char tmp[], int & count, bool & deal_flag) { deal_flag = false;}
 void text_(char tmp[], int & count, bool & deal_flag) { deal_flag = true; }
 
-//form_labelº¯Êı»¹ÓĞÎª×Ô¼ºÔÚÖ¸Áî¶ÁÈëÉÏ¡°²ÁÆ¨¹É¡±µÄÒåÎñ
+//form_labelå‡½æ•°è¿˜æœ‰ä¸ºè‡ªå·±åœ¨æŒ‡ä»¤è¯»å…¥ä¸Šâ€œæ“¦å±è‚¡â€çš„ä¹‰åŠ¡
 void form_label(char label[], int loca, bool flag, char tmp[], int& count)
 {
-	if (!flag) label_local[label] = fp;  //´ËÊ±´¦ÀíµÄÊÇ¾²Ì¬±äÁ¿
-	else label_local[label] = loca;      //´Ë´¦ÊÇÖ¸ÁîµÄÌø×ªµ½µÄµØÖ·
+	if (!flag) label_local[label] = fp;  //æ­¤æ—¶å¤„ç†çš„æ˜¯é™æ€å˜é‡
+	else label_local[label] = loca;      //æ­¤å¤„æ˜¯æŒ‡ä»¤çš„è·³è½¬åˆ°çš„åœ°å€
 
 	int len = strlen(tmp);
 	while ((tmp[count] == ' ' || tmp[count] == '\t' || tmp[count] == '\0') && count < len) ++count;
@@ -895,12 +895,12 @@ void form_label(char label[], int loca, bool flag, char tmp[], int& count)
 
 void form_instruction(char command[], int& loca, char tmp[], int& count)
 {
-	int num = opr[command];   //ÒÔ´Ë×öÒ»¸öË¼Â·Ïòµ¼¡£
+	int num = opr[command];   //ä»¥æ­¤åšä¸€ä¸ªæ€è·¯å‘å¯¼ã€‚
 	form_cmd[(num / 10000) % 10](num, tmp, count);
 	++loca;
 }
 
-//ÎŞ²ÎÊı¡£
+//æ— å‚æ•°ã€‚
 void form_cmd_0(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -908,7 +908,7 @@ void form_cmd_0(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//Á½¸ö¼Ä´æÆ÷ || Ò»¸ö¼Ä´æÆ÷ + Á¢¼´Êı
+//ä¸¤ä¸ªå¯„å­˜å™¨ || ä¸€ä¸ªå¯„å­˜å™¨ + ç«‹å³æ•°
 void form_cmd_1(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -921,7 +921,7 @@ void form_cmd_1(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//Á½¸ö¼Ä´æÆ÷ + Ò»¸ö¼Ä´æ / Á¢¼´Êı
+//ä¸¤ä¸ªå¯„å­˜å™¨ + ä¸€ä¸ªå¯„å­˜ / ç«‹å³æ•°
 void form_cmd_2(int num, char read[], int& count) 
 {
 	tmp_ins tmp;
@@ -935,13 +935,13 @@ void form_cmd_2(int num, char read[], int& count)
 	gt(str, read, count);
 	map<string, int>::iterator reg_itr;
 	reg_itr = reg.find(str);
-	int a = 0;   //×Ö·ûÊı×éµÄ·ÃÎÊÎ»ÖÃ
+	int a = 0;   //å­—ç¬¦æ•°ç»„çš„è®¿é—®ä½ç½®
 	if (reg_itr == reg.end()) tmp.x = to_int(str, a);
 	else tmp.no_of_reg[2] = reg[str];
 	tmp_txt.push_back(tmp);
 }
 
-//Ë«²Î / Èı²Î
+//åŒå‚ / ä¸‰å‚
 void form_cmd_3(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -953,7 +953,7 @@ void form_cmd_3(int num, char read[], int& count)
 	gt(str, read, count);
 	map<string, int>::iterator reg_itr;
 	reg_itr = reg.find(str);
-	int a = 0;    //×Ö·ûÊı×éµÄ·ÃÎÊÎ»ÖÃ
+	int a = 0;    //å­—ç¬¦æ•°ç»„çš„è®¿é—®ä½ç½®
 	if (reg_itr == reg.end()) {
 		tmp.x = to_int(str, a);
 		tmp.no_of_reg[1] = tmp_reg;
@@ -971,7 +971,7 @@ void form_cmd_3(int num, char read[], int& count)
 
 			map<string, int>::iterator reg_itr;
 			reg_itr = reg.find(str2);
-			int a = 0;   //×Ö·ûÊı×éµÄ·ÃÎÊÎ»ÖÃ
+			int a = 0;   //å­—ç¬¦æ•°ç»„çš„è®¿é—®ä½ç½®
 			if (reg_itr == reg.end()) tmp.x = to_int(str2, a);
 			else tmp.no_of_reg[2] = reg[str2];
 		}
@@ -979,7 +979,7 @@ void form_cmd_3(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//Ò»¸ölabel / ¼Ä´æ
+//ä¸€ä¸ªlabel / å¯„å­˜
 void form_cmd_4(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -995,7 +995,7 @@ void form_cmd_4(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//1¸ölabel + 1¸öscr  + 1 ¸ö¼Ä´æ(¶¼²»Òª´æÔÚµÚÒ»¸ö¼Ä´æÆ÷Àï)
+//1ä¸ªlabel + 1ä¸ªscr  + 1 ä¸ªå¯„å­˜(éƒ½ä¸è¦å­˜åœ¨ç¬¬ä¸€ä¸ªå¯„å­˜å™¨é‡Œ)
 void form_cmd_5(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -1007,7 +1007,7 @@ void form_cmd_5(int num, char read[], int& count)
 	gt(str, read, count);
 	map<string, int>::iterator reg_itr;
 	reg_itr = reg.find(str);
-	int a = 0;   //×Ö·ûÊı×éµÄ·ÃÎÊÎ»ÖÃ
+	int a = 0;   //å­—ç¬¦æ•°ç»„çš„è®¿é—®ä½ç½®
 	if (reg_itr == reg.end()) tmp.x = to_int(str, a);
 	else tmp.no_of_reg[2] = reg[str];
 
@@ -1016,7 +1016,7 @@ void form_cmd_5(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//1¸ölabel + 1¸örscr
+//1ä¸ªlabel + 1ä¸ªrscr
 void form_cmd_6(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -1030,8 +1030,8 @@ void form_cmd_6(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//load: Ò»¸ö·ÅÒ»ºÅ¼Ä´æÆ÷£¬ Ò»¸öaddress
-//×¢Òâload¿ÉÄÜµÄÁ½ÖÖ²Ù×÷£¬¿´labelºÍÄÚ´æµØÖ·À´¶¨¡£
+//load: ä¸€ä¸ªæ”¾ä¸€å·å¯„å­˜å™¨ï¼Œ ä¸€ä¸ªaddress
+//æ³¨æ„loadå¯èƒ½çš„ä¸¤ç§æ“ä½œï¼Œçœ‹labelå’Œå†…å­˜åœ°å€æ¥å®šã€‚
 void form_cmd_7(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -1054,7 +1054,7 @@ void form_cmd_7(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//store: 1¸ö·Ç1¼Ä´æÆ÷£¬ Ò»¸öaddress
+//store: 1ä¸ªé1å¯„å­˜å™¨ï¼Œ ä¸€ä¸ªaddress
 void form_cmd_8(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -1076,7 +1076,7 @@ void form_cmd_8(int num, char read[], int& count)
 	tmp_txt.push_back(tmp);
 }
 
-//Ò»¸ö·ÅÒ»ºÅ¼Ä´æÆ÷£¬»¹ÓĞÒ»¸öÎ´Öª
+//ä¸€ä¸ªæ”¾ä¸€å·å¯„å­˜å™¨ï¼Œè¿˜æœ‰ä¸€ä¸ªæœªçŸ¥
 void form_cmd_9(int num, char read[], int& count)
 {
 	tmp_ins tmp;
@@ -1089,7 +1089,7 @@ void form_cmd_9(int num, char read[], int& count)
 	if (str[0] != NULL && str[0] != '#') {
 		map<string, int>::iterator reg_itr;
 		reg_itr = reg.find(str);
-		int a = 0;   //×Ö·ûÊı×éµÄ·ÃÎÊÎ»ÖÃ
+		int a = 0;   //å­—ç¬¦æ•°ç»„çš„è®¿é—®ä½ç½®
 		if (reg_itr == reg.end()) tmp.x = to_int(str, a);
 		else tmp.no_of_reg[1] = reg[str];
 	}
