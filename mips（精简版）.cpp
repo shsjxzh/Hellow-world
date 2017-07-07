@@ -49,9 +49,7 @@ struct instruction {
 	int x;                        //立即数或是偏移量（lw等操作）
 	int label;                    //label的跳转序号,涉及指令的跳转和静态变量的访问
 
-	instruction() {
-		//x_exist = false;
-	}
+	instruction() {;}
 	instruction(const tmp_ins& obj) {
 		No = obj.No;
 		for (int i = 0; i < 3; ++i) no_of_reg[i] = obj.no_of_reg[i];
