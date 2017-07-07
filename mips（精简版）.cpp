@@ -9,8 +9,6 @@
 #include <queue>
 using namespace std;
 
-//调试
-//ofstream fout("log.out");
 //此处是内存大小的定义
 const int M = 1024 * 1024;
 //const int SIZE = 4 * M; 调试结束后改回
@@ -25,8 +23,6 @@ int rgstr[34] = { 0 };   //指定32号寄存器为低位寄存器，33号寄存�
 char Memory[SIZE + 1] = { 0 };  //视情况决定是否改成unsigned
 int fp = 0; int sp = SIZE;      //fp代表堆空间的帧指针，地址由低到高； sp代表栈空间的的栈指针，地址由高到低。
                                 //注意fp指针指向的是空的内存
-
-map<int, string> map_out;
 //此处是指令类型
 map<string, int> label_local;
 struct tmp_ins{               
