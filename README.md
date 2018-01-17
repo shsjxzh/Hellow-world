@@ -1,3 +1,2 @@
-# Hellow-world
-A new repository
-Hellow everyone! My name is Xu Zihao.
+# Mips
+Projects for 2017 PPCA
