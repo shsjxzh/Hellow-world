@@ -1,2 +1,2 @@
 # Mips
-Projects for 2017 PPCA
+temporary storage for Projects of 2017 PPCA
